@@ -1,22 +1,22 @@
 <template>
   <div>
-    <h4>Kevin's Dashboard</h4>
-    <h5><br>Solved problems:</h5>
+    <h5>Welcome back, Kevin.</h5>
+    <h6><br>Solved problems:</h6>
 
         <span v-if="solved.length > 0"><div v-for="i in solved" class="card darken-1">
           <div class="card-content white-text">
-            <span class="card-title">Card Title</span>
-            <p>I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively.</p>
+            <span class="card-title">{{i.title.substring(0,80)}}</span>
           </div>
           <div class="card-action">
-            Progress
+            Status: Complete
+            <a class="btn" style="float: right" :href="'/#/problem/'+i.id">Open</a>
           </div>
         </div>
         </span>
         <p v-else>None yet, start on <a href="/#/problem/0">Problem 1</a></p>
 
         <br>
-        <a href="/#/problems/0" class="waves-effect waves-light btn">Try Problems</a>
+        <a href="/#/problem/0" style="background-color: #BF4141;" class="waves-effect waves-light btn">Try Problems</a>
 
   </div>
 </template>
@@ -32,11 +32,19 @@ export default {
   },
   mounted(){
     var vm = this
-    var user_id = '12345678'
+    var user_id = '1'
     axios.get('//127.0.0.1:5000/users/'+user_id+'/solved/').then(function(data){
       console.log(data)
+      var solved = [...new Set(data.data.solved)]
+      solved.forEach(function(id){
+        axios.get('//127.0.0.1:5000/problems/' + id).then(function(data) {
+          console.log(data)
+          vm.solved.unshift(data.data.problems)
+        })
+      })
     })
   }
+
 }
 </script>
 
@@ -46,6 +54,14 @@ export default {
   width: 300px;
   display: inline-block;
   margin-right: 10px;
+}
+
+.card {
+    background-color: #292C34;
+    width: 300px;
+}
+.card-action {
+  min-height: 70px;
 }
 
 </style>

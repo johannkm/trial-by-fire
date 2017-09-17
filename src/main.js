@@ -10,6 +10,10 @@ Vue.directive('tooltip', VTooltip)
 
 Vue.use(VueCodeMirror)
 
+import Notifications from 'vue-notification'
+
+Vue.use(Notifications)
+
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

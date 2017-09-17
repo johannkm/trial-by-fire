@@ -5,12 +5,13 @@
 
       <div class="col s3 m2 fake-sidebar"></div>
       <div class="col s3 m2 sidebar">
-        <div class="section">
-          <h4>Code Platform</h4>
-          <div class="divider"></div>
+        <div style="text-align:center" class="section">
+          <h5 id="title"><span style="color:red">//</span>trialbyfire</h5>
           <br>
-          <a class="waves-effect waves-light btn" href="/#/">Dashboard</a>
-          <a class="waves-effect waves-light btn" href="/#/problem/0">Problems</a>
+          <div id="bar" class="divider"></div>
+          <br>
+          <a class="waves-effect waves-light btn" style="text-transform:lowercase" href="/#/">Dashboard</a>
+          <a class="waves-effect waves-light btn" style="text-transform:lowercase" href="/#/problem/0">Problems</a>
         </div>
       </div>
 
@@ -18,6 +19,7 @@
         <router-view></router-view>
       </div>
     </div>
+    <notifications group="submit" position="bottom right" />
     </div>
 </template>
 
@@ -34,7 +36,7 @@ export default {
 
 <style>
 html {
-  background-color: #292C34;
+  background-color: #17181D;
   color: white;
 }
 
@@ -66,5 +68,17 @@ nav {
   margin-top: 10px;
   width: 100%;
   background-color: #191919;
+}
+
+.my-style {
+  background: #4183D7;
+}
+
+div ul {
+  border-color: #76787D!important;
+}
+
+#bar {
+  background-color: #76787D;
 }
 </style>
