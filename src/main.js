@@ -3,6 +3,9 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import VueCodeMirror from 'vue-codemirror'
+
+Vue.use(VueCodeMirror)
 
 Vue.config.productionTip = false
 
