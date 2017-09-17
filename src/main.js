@@ -5,6 +5,9 @@ import App from './App'
 import router from './router'
 import VueCodeMirror from 'vue-codemirror'
 
+import { VTooltip } from 'v-tooltip'
+Vue.directive('tooltip', VTooltip)
+
 Vue.use(VueCodeMirror)
 
 Vue.config.productionTip = false

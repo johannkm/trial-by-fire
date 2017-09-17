@@ -8,8 +8,8 @@
 
       <ul class="collapsible" data-collapsible="expandable">
         <li>
-          <div class="collapsible-header active">Question</div>
-          <div class="collapsible-body">
+          <div class="collapsible-header active" @click="showBox0=!showBox0">Question</div>
+          <div class="collapsible-body" :style="'display:'+(showBox0 ? 'block' : '')">
             <p>{{problem.input}}</p>
             <p>{{problem.output}}</p>
             <p v-if="problem.constraints">
@@ -18,25 +18,43 @@
           </div>
         </li>
         <li>
-          <div class="collapsible-header">Code Editor</div>
-          <div class="collapsible-body no-pad">
+          <div class="collapsible-header" @click="showBox1=!showBox1">Test Cases &nbsp;<i v-tooltip="'Write code to test<br>every different case<br>of the algorithm.'" class="material-icons Medium">info_outline</i></div>
+          <div class="collapsible-body no-pad" :style="'display:'+(showBox1 ? 'block' : '')">
                   <codemirror v-model="content" :options="editorOptions"></codemirror>
 
             </div>
         </li>
-        <li>
-          <div class="collapsible-header">Test cases</div>
-          <div class="collapsible-body no-pad">
+        <!-- <li>
+          <div class="collapsible-header" @click="showBox2=!showBox2">Test cases</div>
+          <div class="collapsible-body no-pad" :style="'display:'+(showBox2 ? 'block' : '')">
                   <codemirror v-model="testCases" :options="testCaseOptions"></codemirror>
             </div>
-        </li>
+        </li> -->
         <li>
-          <div class="collapsible-header">Results</div>
-          <div class="collapsible-body no-pad">
+          <div class="collapsible-header" @click="showBox3=!showBox3">Results</div>
+          <div class="collapsible-body no-pad" :style="'display:'+(showBox3 ? 'block' : '')">
             <div id="console">
               <div id="inner-console">
                 <span v-if="results == null">No results yet.</span>
-                <pre v-else>{{results.results}}<br>Runtime: {{results.runtime}}s</pre>
+                <span v-else>
+                  <span v-if="results.results.status=='bad'">
+                    Failed<br>
+                    Your test \'{{results.results.case}}\' is incorrect.
+                  </span>
+                  <span v-else-if="results.results.status=='good'">
+                    Passed!<br>
+                    You tested for every case.
+                  </span>
+                  <span v-else>
+                    Failed<br>
+                    You need to:<br>
+                    <span v-for="msg in results.results.messages">
+                      - {{msg}}<br>
+                    </span>
+                  </span>
+                  <br>
+                  Runtime: {{results.runtime}}s
+                </span>
               </div>
             </div>
           </div>
@@ -46,7 +64,7 @@
     <div>
     <a class="waves-effect waves-light btn" @click="submitCode">Submit</a>
     <span>&nbsp;&nbsp;&nbsp;</span>
-    <a class="waves-effect waves-light btn btn-gray" @click="moveProblems(-1)">Previos</a>
+    <a class="waves-effect waves-light btn btn-gray" @click="moveProblems(-1)">Previous</a>
     <a class="waves-effect waves-light btn btn-gray" @click="moveProblems(1)">Next</a>
     </div>
     <br><br>
@@ -54,6 +72,7 @@
 </template>
 
 <script>
+
 var firebase = require('firebase')
 var axios = require('axios')
 
@@ -110,6 +129,10 @@ export default {
       content: '',
       testCases: '',
       results: null,
+      showBox0 : true,
+      showBox1 : true,
+      showBox2 : true,
+      showBox3 : true,
       editorOptions: {
         tabSize: 2,
         styleActiveLine: false,
@@ -138,7 +161,7 @@ export default {
         styleSelectedText: true,
         gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
         highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true },
-        mode: 'text/plain',
+        mode: 'text/x-python',
         hintOptions: {
           completeSingle: false
         },
@@ -191,10 +214,24 @@ export default {
     submitCode() {
       var vm = this
       var user_id = '12345678'
+      var content = this.content.replace(/"/g, "'").split("\n").map(function(s){
+        return '  '+s
+      })
+      console.log({code:content})
       var problem_id = this.$route.params.id
+
+      axios({
+        method: 'post',
+        url: ('//127.0.0.1:5000/users/' + user_id + '/submissions/' + problem_id),
+        data: {
+          code : content
+        }
+      })
+
       axios.post('//127.0.0.1:5000/users/' + user_id + '/submissions/' + problem_id, {
-        code: vm.content.replace(/"/g, "'").split("\n")
+        code: content
       }).then(function(data) {
+        console.log(data)
         console.log(data)
         vm.results = data.data.submission[0]
       })
@@ -241,14 +278,43 @@ export default {
 }
 
 #app > div > div.col.s9.m10 > div > div.section > ul > li > div.collapsible-body {
-  display: block;
+  /* display: block; */
 }
 
 #app > div > div.col.s9.m10 > div > div.section > ul > li > div.collapsible-header {
-  cursor: auto;
+  /* cursor: auto; */
 }
 
 #app > div > div.col.s9.m10 > div > div.section > ul > li:nth-child(3) > div.collapsible-body.no-pad > div {
-  height: 200px;
+  /* height: 200px; */
+}
+
+.tooltip {
+  display: block !important;
+  padding: 4px;
+  z-index: 10000;
+}
+
+.tooltip .tooltip-inner {
+  background: black;
+  color: white;
+  border-radius: 16px;
+  padding: 5px 10px 4px;
+}
+
+.tooltip .tooltip-arrow {
+  display: none;
+}
+
+.tooltip[aria-hidden='true'] {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .15s, visibility .15s;
+}
+
+.tooltip[aria-hidden='false'] {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity .15s;
 }
 </style>
